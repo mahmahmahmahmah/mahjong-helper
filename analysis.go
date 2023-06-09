@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/EndlessCheng/mahjong-helper/util"
+	"github.com/mahmahmahmahmah/mahjong-helper/util"
 	"fmt"
 	"strings"
 	"github.com/fatih/color"
-	"github.com/EndlessCheng/mahjong-helper/util/model"
+	"github.com/mahmahmahmahmah/mahjong-helper/util/model"
 )
 
 func simpleBestDiscardTile(playerInfo *model.PlayerInfo) int {
@@ -55,7 +55,7 @@ func analysisPlayerWithRisk(playerInfo *model.PlayerInfo, mixedRiskTable riskTab
 	switch countOfTiles % 3 {
 	case 1:
 		result := util.CalculateShantenWithImproves13(playerInfo)
-		fmt.Println("当前" + util.NumberToChineseShanten(result.Shanten) + "：")
+		fmt.Println("Current " + util.NumberToChineseShanten(result.Shanten) + "：")
 		r := &analysisResult{
 			discardTile34:  -1,
 			result13:       result,
@@ -68,12 +68,12 @@ func analysisPlayerWithRisk(playerInfo *model.PlayerInfo, mixedRiskTable riskTab
 
 		// 提示信息
 		if shanten == -1 {
-			color.HiRed("【已和牌】")
+			color.HiRed("【Have drawn】")
 		} else if shanten == 0 {
 			if len(results14) > 0 {
 				r13 := results14[0].Result13
 				if r13.RiichiPoint > 0 && r13.FuritenRate == 0 && r13.DamaPoint >= 5200 && r13.DamaWaits.AllCount() == r13.Waits.AllCount() {
-					color.HiGreen("默听打点充足：追求和率默听，追求打点立直")
+					color.HiGreen("Sufficient listening and management: pursue and rate silent listening, pursue management and uprightness")
 				}
 				// 局收支相近时，提示：局收支相近，追求和率打xx，追求打点打xx
 			}
@@ -90,7 +90,7 @@ func analysisPlayerWithRisk(playerInfo *model.PlayerInfo, mixedRiskTable riskTab
 		printResults14WithRisk(results14, mixedRiskTable)
 		printResults14WithRisk(incShantenResults14, mixedRiskTable)
 	default:
-		err := fmt.Errorf("参数错误: %d 张牌", countOfTiles)
+		err := fmt.Errorf("Parameter error: %d cards", countOfTiles)
 		if debugMode {
 			panic(err)
 		}
@@ -109,14 +109,14 @@ func analysisPlayerWithRisk(playerInfo *model.PlayerInfo, mixedRiskTable riskTab
 // mixedRiskTable: 危险度表
 func analysisMeld(playerInfo *model.PlayerInfo, targetTile34 int, isRedFive bool, allowChi bool, mixedRiskTable riskTable) error {
 	if handsCount := util.CountOfTiles34(playerInfo.HandTiles34); handsCount%3 != 1 {
-		return fmt.Errorf("手牌错误：%d 张牌 %v", handsCount, playerInfo.HandTiles34)
+		return fmt.Errorf("Hand error: %d cards %v", handsCount, playerInfo.HandTiles34)
 	}
 	// 原始手牌分析
 	result := util.CalculateShantenWithImproves13(playerInfo)
 	// 副露分析
 	shanten, results14, incShantenResults14 := util.CalculateMeld(playerInfo, targetTile34, isRedFive, allowChi)
 	if len(results14) == 0 && len(incShantenResults14) == 0 {
-		return nil // fmt.Errorf("输入错误：无法鸣这张牌")
+		return nil // fmt.Errorf("Input error: Cannot call this card")
 	}
 
 	// 鸣牌
@@ -137,11 +137,11 @@ func analysisMeld(playerInfo *model.PlayerInfo, targetTile34 int, isRedFive bool
 	// 提示信息
 	// TODO: 局收支相近时，提示：局收支相近，追求和率打xx，追求打点打xx
 	if shanten == -1 {
-		color.HiRed("【已和牌】")
+		color.HiRed("【Have drawn】")
 	} else if shanten <= 1 {
 		// 鸣牌后听牌或一向听，提示型听
 		if len(results14) > 0 && results14[0].LeftDrawTilesCount > 0 && results14[0].LeftDrawTilesCount <= 16 {
-			color.HiGreen("考虑型听？")
+			color.HiGreen("Consider listening?")
 		}
 	}
 
@@ -171,11 +171,11 @@ func analysisHumanTiles(humanTilesInfo *model.HumanTilesInfo) (playerInfo *model
 
 	tileCount := util.CountOfTiles34(tiles34)
 	if tileCount > 14 {
-		return nil, fmt.Errorf("输入错误：%d 张牌", tileCount)
+		return nil, fmt.Errorf("Input error: %d cards", tileCount)
 	}
 
 	if tileCount%3 == 0 {
-		color.HiYellow("%s 是 %d 张牌\n助手随机补了一张牌", humanTilesInfo.HumanTiles, tileCount)
+		color.HiYellow("%s is %d cards\nThe assistant made up a card randomly", humanTilesInfo.HumanTiles, tileCount)
 		util.RandomAddTile(tiles34)
 	}
 
@@ -197,7 +197,7 @@ func analysisHumanTiles(humanTilesInfo *model.HumanTilesInfo) (playerInfo *model
 		case len(tiles) == 4 && !isUpper:
 			meldType = model.MeldTypeMinkan
 		default:
-			return nil, fmt.Errorf("输入错误: %s", humanMeld)
+			return nil, fmt.Errorf("Typo error: %s", humanMeld)
 		}
 		containRedFive := false
 		for i, c := range _numRedFives {
@@ -225,7 +225,7 @@ func analysisHumanTiles(humanTilesInfo *model.HumanTilesInfo) (playerInfo *model
 
 	if humanTilesInfo.HumanTargetTile != "" {
 		if tileCount%3 == 2 {
-			return nil, fmt.Errorf("输入错误: %s 是 %d 张牌", humanTilesInfo.HumanTiles, tileCount)
+			return nil, fmt.Errorf("Typo error: %s is %d cards", humanTilesInfo.HumanTiles, tileCount)
 		}
 		targetTile34, isRedFive, er := util.StrToTile34(humanTilesInfo.HumanTargetTile)
 		if er != nil {
