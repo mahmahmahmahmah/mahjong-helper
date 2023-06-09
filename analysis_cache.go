@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/EndlessCheng/mahjong-helper/util"
+	"github.com/mahmahmahmahmah/mahjong-helper/util"
 	"github.com/fatih/color"
 )
 
@@ -46,7 +46,7 @@ type roundAnalysisCache struct {
 
 func (rc *roundAnalysisCache) print() {
 	const (
-		baseInfo  = "助手正在计算推荐舍牌，请稍等……（计算结果仅供参考）"
+		baseInfo  = "The assistant is calculating the recommended house cards, please wait a moment... (The calculation results are for reference only)"
 		emptyInfo = "--"
 		sep       = "  "
 	)
@@ -87,14 +87,14 @@ func (rc *roundAnalysisCache) print() {
 		fmt.Print(suffix)
 	}
 
-	fmt.Print("自家切牌")
+	fmt.Print("Cut your own cards")
 	if done {
 		for i, c := range rc.cache {
 			suffix := ""
 			if c.isRiichiWhenDiscard {
-				suffix = "[立直]"
+				suffix = "[Right]"
 			} else if c.selfDiscardTile == -1 && i == len(rc.cache)-1 {
-				//suffix = "[自摸]"
+				//suffix = "[self touch]"
 				// TODO: 流局
 			}
 			printTileInfo(c.selfDiscardTile, c.selfDiscardTileRisk, suffix)
@@ -102,7 +102,7 @@ func (rc *roundAnalysisCache) print() {
 	}
 	fmt.Println()
 
-	fmt.Print("进攻推荐")
+	fmt.Print("Offensive recommendation")
 	if done {
 		for _, c := range rc.cache {
 			printTileInfo(c.aiAttackDiscardTile, c.aiAttackDiscardTileRisk, "")
@@ -110,7 +110,7 @@ func (rc *roundAnalysisCache) print() {
 	}
 	fmt.Println()
 
-	fmt.Print("防守推荐")
+	fmt.Print("Defensive recommendation")
 	if done {
 		for _, c := range rc.cache {
 			printTileInfo(c.aiDefenceDiscardTile, c.aiDefenceDiscardTileRisk, "")
@@ -246,7 +246,7 @@ func getCurrentAnalysisCache() *gameAnalysisCache {
 func (c *gameAnalysisCache) runMajsoulRecordAnalysisTask(actions majsoulRoundActions) error {
 	// 从第一个 action 中取出局和场
 	if len(actions) == 0 {
-		return fmt.Errorf("数据异常：此局数据为空")
+		return fmt.Errorf("Data exception: the data in this round is empty")
 	}
 
 	newRoundAction := actions[0]
@@ -257,12 +257,12 @@ func (c *gameAnalysisCache) runMajsoulRecordAnalysisTask(actions majsoulRoundAct
 	if roundCache == nil {
 		roundCache = &roundAnalysisCache{isStart: true}
 		if debugMode {
-			fmt.Println("助手正在计算推荐舍牌…… 创建 roundCache")
+			fmt.Println("Helper is calculating recommended round cards... Create roundCache")
 		}
 		c.wholeGameCache[roundNumber][ben] = roundCache
 	} else if roundCache.isStart {
 		if debugMode {
-			fmt.Println("无需重复计算")
+			fmt.Println("No need to double count")
 		}
 		return nil
 	}
@@ -278,13 +278,13 @@ func (c *gameAnalysisCache) runMajsoulRecordAnalysisTask(actions majsoulRoundAct
 	for i, action := range actions[:len(actions)-1] {
 		if c.majsoulRecordUUID != getMajsoulCurrentRecordUUID() {
 			if debugMode {
-				fmt.Println("用户退出该牌谱")
+				fmt.Println("User exits the deck")
 			}
 			// 提前退出，减少不必要的计算
 			return nil
 		}
 		if debugMode {
-			fmt.Println("助手正在计算推荐舍牌…… action", i)
+			fmt.Println("The assistant is calculating the recommended house cards... action", i)
 		}
 		majsoulRoundData.msg = action.Action
 		majsoulRoundData.analysis()
@@ -293,7 +293,7 @@ func (c *gameAnalysisCache) runMajsoulRecordAnalysisTask(actions majsoulRoundAct
 
 	if c.majsoulRecordUUID != getMajsoulCurrentRecordUUID() {
 		if debugMode {
-			fmt.Println("用户退出该牌谱")
+			fmt.Println("User exits the deck")
 		}
 		return nil
 	}
